@@ -1,3 +1,0 @@
-DICOMDIR
-npy_dir
-area.png

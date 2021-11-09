@@ -52,7 +52,7 @@ def read(read_path, read_name, num):
 img_save = '/home/lihang/pretreatment/line-ending/'
 npy_save = '/home/lihang/pretreatment/npy-ending/'
 txt_save = '/home/lihang/pretreatment/txt-ending/'
-img_save_plt = '/home/lihang/pretreatment/plt-ending/'
+img_save_plt = '/home/lihang/pretreatment/show-curve-single/'
 img_root = '/home/lihang/pretreatment/data_end/'
 
 dir_name = os.listdir(img_root)
@@ -92,8 +92,8 @@ for name in dir_name:
         # list.append(sub)
         list.append(hullArea)
         list.append(rectArea)
-        list.append(high)
-        list.append(weight)
+        list.append(high*300)
+        list.append(weight*300)
         list_all.append(list)
         j = j + 1
         for i in range(len(hull)):
@@ -105,80 +105,32 @@ for name in dir_name:
         save_name_end = save_name + sub
         cv2.imwrite(save_name_end, img)
 
-    name_npy = name + '.npy'
-    save_name_npy = os.path.join(npy_save, name_npy)
-
-    #np.save(save_name_npy, list_all)
-    plt_name = name + 'plt.jpg'
+    plt_name = name + '.jpg'
     save_plt_name = os.path.join(img_save_plt, plt_name)
 
-    name_txt = name + '.txt'
-    save_name_txt = os.path.join(txt_save, name_txt)
 
     array = np.array(list_all)
-    ecg_hull = array[:,0]
-    ecg_react = array[:,1]
-    ecg_height = array[:,2]
-    ecg_weight = array[:,3]
-
-    #ecg = array[:, 1]
-    peaks, _ = signal.find_peaks(ecg_react, distance=25)
-    ecging_hull = ecg_hull[peaks[0]:peaks[2]]
-    ecging_react = ecg_react[peaks[0]:peaks[2]]
-    ecging_height = ecg_height[peaks[0]:peaks[2]]
-    ecging_weight = ecg_weight[peaks[0]:peaks[2]]
-    #ecging = ecg[peaks[0]:peaks[2]]
-
-    ecg_resample_hull = signal.resample(ecging_hull, 512)
-    ecg_resample_react = signal.resample(ecging_react, 512)
-    ecg_resample_height = signal.resample(ecging_height, 512)
-    ecg_resample_weight = signal.resample(ecging_weight, 512)
-
-    ecg_all = []
-    ecg_all.append(ecg_resample_hull)
-    ecg_all.append(ecg_resample_react)
-    ecg_all.append(ecg_resample_height)
-    ecg_all.append(ecg_resample_weight)
-
-    # ecg_all.append(ecging_hull)
-    # ecg_all.append(ecging_react)
-    # ecg_all.append(ecging_height)
-    # ecg_all.append(ecging_weight)
-
-    ecg_all_trans = np.transpose(ecg_all)
-    np.save(save_name_npy,ecg_all_trans)
-
-    print(save_name_npy + " had been writtern")
-    boxes = np.load(save_name_npy)
-
-    np.savetxt(save_name_txt, boxes, fmt='%s', newline='\n')
-    print(save_name_txt + " had been writtern")
-
-    x_ecg = [i for i in range(ecg_all[0].shape[0])]
-    # plt.subplot(2, 1, 1)
-    # plt.plot(x_ecg, ecg_all[0])
-    # plt.plot(x_ecg, ecg_all[1])
-
-    x_ecg_origin = [i for i in range(array.shape[0])]
-    # plt.subplot(2, 1, 1)
-    # plt.plot(x_ecg_origin, array[:, 0])
-    # plt.plot(x_ecg_origin, array[:, 1])
-    #
+    x_ecg = [i for i in range(array.shape[0])]
+    #plt.subplot(2, 1, 1)
+    plt.plot(x_ecg, array[:,0])
+    plt.plot(x_ecg, array[:, 1])
     # plt.subplot(2, 1, 2)
-    # plt.plot(x_ecg, ecg_all[0])
-    # plt.plot(x_ecg, ecg_all[1])
-
-    plt.subplot(2, 1, 1)
-    plt.plot(x_ecg, ecg_all[0])
-    plt.plot(x_ecg, ecg_all[1])
-    plt.subplot(2, 1, 2)
-    plt.plot(x_ecg, ecg_all[2])
-    plt.plot(x_ecg, ecg_all[3])
-
+    plt.plot(x_ecg, array[:, 2])
+    plt.plot(x_ecg, array[:, 3])
     plt.savefig(save_plt_name)
     plt.close()  # 有效解决了画图时多条曲线（也就是上一张图的曲线残留）重叠问题
     print(save_plt_name + " had been drawn!")
     plt.show(block=False)
+
+    #np.save(save_name_npy, list_all)
+
+
+
+
+    # plt.savefig(save_plt_name)
+    # plt.close()  # 有效解决了画图时多条曲线（也就是上一张图的曲线残留）重叠问题
+    # print(save_plt_name + " had been drawn!")
+    # plt.show(block=False)
 
 
 print('sucessful')

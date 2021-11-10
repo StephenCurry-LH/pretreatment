@@ -99,10 +99,10 @@ import numpy as np
 def maxminnorm(array):
     maxcols = array.max(axis = 0)
     mincols = array.min(axis = 0)
-    data_shape = array.shape
+    data_shape = array.shape#返回的数组的维数
     data_rows = data_shape[0]
     data_cols = data_shape[1]
-    t = np.empty((data_rows,data_cols))
+    t = np.empty((data_rows,data_cols))#返回一个随机数组
     for i in range(data_cols):
         t[:,i] = (array[:,i] - mincols[i]) / (maxcols[i] - mincols[i])
     return t

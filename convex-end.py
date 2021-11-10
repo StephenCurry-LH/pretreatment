@@ -25,6 +25,16 @@ class Nstr:
         c = self.x.replace(other.x, "")
         return c
 
+def maxminnorm(array):
+    maxcols = array.max(axis = 0)
+    mincols = array.min(axis = 0)
+    data_shape = array.shape
+    data_rows = data_shape[0]
+    data_cols = data_shape[1]
+    t = np.empty((data_rows,data_cols))
+    for i in range(data_cols):
+        t[:,i] = (array[:,i] - mincols[i]) / (maxcols[i] - mincols[i])
+    return t
 
 def max_contour(contours):  # 用于找到图片中面积最大的图形并返回
     areas = []
@@ -123,10 +133,10 @@ for name in dir_name:
 
     #ecg = array[:, 1]
     peaks, _ = signal.find_peaks(ecg_react, distance=25)
-    ecging_hull = ecg_hull[peaks[0]:peaks[2]]
-    ecging_react = ecg_react[peaks[0]:peaks[2]]
-    ecging_height = ecg_height[peaks[0]:peaks[2]]
-    ecging_weight = ecg_weight[peaks[0]:peaks[2]]
+    ecging_hull = ecg_hull[peaks[1]:peaks[2]]
+    ecging_react = ecg_react[peaks[1]:peaks[2]]
+    ecging_height = ecg_height[peaks[1]:peaks[2]]
+    ecging_weight = ecg_weight[peaks[1]:peaks[2]]
     #ecging = ecg[peaks[0]:peaks[2]]
 
     ecg_resample_hull = signal.resample(ecging_hull, 512)
@@ -146,7 +156,8 @@ for name in dir_name:
     # ecg_all.append(ecging_weight)
 
     ecg_all_trans = np.transpose(ecg_all)
-    np.save(save_name_npy,ecg_all_trans)
+    ecg_all_trans_normal = maxminnorm(ecg_all_trans)
+    np.save(save_name_npy,ecg_all_trans_normal)
 
     print(save_name_npy + " had been writtern")
     boxes = np.load(save_name_npy)
@@ -168,12 +179,12 @@ for name in dir_name:
     # plt.plot(x_ecg, ecg_all[0])
     # plt.plot(x_ecg, ecg_all[1])
 
-    plt.subplot(2, 1, 1)
-    plt.plot(x_ecg, ecg_all[0])
-    plt.plot(x_ecg, ecg_all[1])
-    plt.subplot(2, 1, 2)
-    plt.plot(x_ecg, ecg_all[2])
-    plt.plot(x_ecg, ecg_all[3])
+    #plt.subplot(2, 1, 1)
+    plt.plot(x_ecg, ecg_all_trans_normal[0])
+    plt.plot(x_ecg, ecg_all_trans_normal[1])
+    #plt.subplot(2, 1, 2)
+    plt.plot(x_ecg, ecg_all_trans_normal[2])
+    plt.plot(x_ecg, ecg_all_trans_normal[3])
 
     plt.savefig(save_plt_name)
     plt.close()  # 有效解决了画图时多条曲线（也就是上一张图的曲线残留）重叠问题

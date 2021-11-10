@@ -1,10 +1,10 @@
-# import numpy as np
-# from scipy.signal import argrelextrema
-# import pylab as pl
-# import matplotlib.pyplot as plt
-# import scipy.signal as signal
-# from scipy import signal
-# import os
+import numpy as np
+from scipy.signal import argrelextrema
+import pylab as pl
+import matplotlib.pyplot as plt
+import scipy.signal as signal
+from scipy import signal
+import os
 # # def maximum(array):
 # #     length = len(array)
 # #     max = []
@@ -18,10 +18,89 @@
 #     peaks, _ = signal.find_peaks(array, distance=30)
 #     return array[peaks[0],peaks[2]]
 #
-# if __name__ == '__main__':
-#     # x = np.array([
-#     #     0, 6, 25, 20, 15, 8, 15, 6, 0, 6, 0, -5, -15, -3, 4, 10, 8, 13, 8, 10, 3,
-#     #     1, 20, 7, 3, 0])
+def maxmin(array,num):
+    lenth = int(len(array))
+    list = []
+    one = []
+    for i in range(lenth):
+        for j in range(num):
+            # if i - j >= 0 and i + j < lenth:
+            #     left = array[i - j]
+            #     right = array[i + j]
+            # else:
+            #     if i - j < 0:
+            #         left = 0
+            #     else:
+            #         if i + j >= lenth:
+            #             right = 0
+            if i - (j + 1) < 0:
+                left = -1
+            else:
+                left = array[i - j - 1]
+            if i + j + 1 >= lenth:
+                right = -1
+            else:
+                right = array[i + j + 1]
+            #print(left)
+            #print(right)
+            #print(right)
+            if array[i] >= left and array[i] >= right:
+                one.append(j)
+        if len(one) == num:
+            list.append(i)
+        one = []
+    list_end = []
+    for i in range(len(list)-1):
+        #print(l[i + 1])
+        if (list[i+1] - list[i]) >= num:
+            #print("right")
+            list_end.append(list[i])
+    list_end.append(list[len(list)-1])
+    # for k in range(len(list)):
+    #     for number in range(len(list)):
+    #         if list[k] + num >= list[number]:
+    #             list.pop(number)
+        # for number in list:
+        #     if list[k] + num > number:
+        #         list.remove(number)
+    return list_end
+   #
+        # if array[i] > left and array[i] > right:
+        #         list.append(i)
+    # return list
+
+if __name__ == '__main__':
+    x = np.array([
+        0, 6, 25, 20, 15, 8, 15, 6, 0, 6, 0, 5, 15, 3, 4, 10, 8, 13, 8, 10, 3,
+        1, 20, 7, 3, 0])
+    y= np.array([
+        6,6,6, 5, 4,6,6,6, 3,6])
+    # print(maxmin(x,3))
+    # print(len(maxmin(x, 3)))
+    print(len(maxmin(y, 2)))
+    l = maxmin(y,2)
+    print(l)
+    # r = []
+    # for i in range(len(l)-1):
+    #     #print(l[i + 1])
+    #     if (l[i+1] - l[i]) >= 3:
+    #         print("right")
+    #         r.append(l[i])
+    # r.append(l[len(l)-1])
+    #     #l.pop(i)
+    #    # if (l[i + 1] - l[i]) < 3:
+    #    #   del l[i]
+    # print(r)
+           # print(l[i])
+           # print(l[j])
+    #print(maxmin(y,2))
+    #for i in range(len(y)):
+        #print(i)
+    #25 13 20
+    # plt.plot(x)
+    # plt.show()
+
+    #maxmin(x,3)
 #     # print(x[2:5])
 #     # print(type(x))
 #     # # y = signal.resample(x,(0:5))
@@ -95,17 +174,17 @@
 
 
 
-import numpy as np
-def maxminnorm(array):
-    maxcols = array.max(axis = 0)
-    mincols = array.min(axis = 0)
-    data_shape = array.shape#返回的数组的维数
-    data_rows = data_shape[0]
-    data_cols = data_shape[1]
-    t = np.empty((data_rows,data_cols))#返回一个随机数组
-    for i in range(data_cols):
-        t[:,i] = (array[:,i] - mincols[i]) / (maxcols[i] - mincols[i])
-    return t
-if __name__ == '__main__':
-    x = np.array([(1,2,3),(4,5,6),(98,54,32)],dtype = float)
-    print(maxminnorm(x))
+# import numpy as np
+# def maxminnorm(array):
+#     maxcols = array.max(axis = 0)
+#     mincols = array.min(axis = 0)
+#     data_shape = array.shape#返回的数组的维数
+#     data_rows = data_shape[0]
+#     data_cols = data_shape[1]
+#     t = np.empty((data_rows,data_cols))#返回一个随机数组
+#     for i in range(data_cols):
+#         t[:,i] = (array[:,i] - mincols[i]) / (maxcols[i] - mincols[i])
+#     return t
+# if __name__ == '__main__':
+#     x = np.array([(1,2,3),(4,5,6),(98,54,32)],dtype = float)
+#     print(maxminnorm(x))

@@ -36,6 +36,53 @@ def maxminnorm(array):
         t[:,i] = (array[:,i] - mincols[i]) / (maxcols[i] - mincols[i])
     return t
 
+
+def maxmin(array,num):
+    lenth = int(len(array))
+    list = []
+    one = []
+    for i in range(lenth):
+        for j in range(num):
+            # if i - j >= 0 and i + j < lenth:
+            #     left = array[i - j]
+            #     right = array[i + j]
+            # else:
+            #     if i - j < 0:
+            #         left = 0
+            #     else:
+            #         if i + j >= lenth:
+            #             right = 0
+            if i - (j + 1) < 0:
+                left = -1
+            else:
+                left = array[i - j - 1]
+            if i + j + 1 >= lenth:
+                right = -1
+            else:
+                right = array[i + j + 1]
+            #print(left)
+            #print(right)
+            #print(right)
+            if array[i] >= left and array[i] >= right:
+                one.append(j)
+        if len(one) == num:
+            list.append(i)
+        one = []
+    list_end = []
+    for i in range(len(list)-1):
+        #print(l[i + 1])
+        if (list[i+1] - list[i]) >= num:
+            #print("right")
+            list_end.append(list[i])
+    list_end.append(list[len(list)-1])
+    # for k in range(len(list)):
+    #     for number in range(len(list)):
+    #         if list[k] + num >= list[number]:
+    #             list.pop(number)
+        # for number in list:
+        #     if list[k] + num > number:
+        #         list.remove(number)
+    return list_end
 def max_contour(contours):  # 用于找到图片中面积最大的图形并返回
     areas = []
     for c in range(len(contours)):
@@ -60,8 +107,8 @@ def read(read_path, read_name, num):
     return read_list
 
 img_save = '/home/lihang/pretreatment/line-ending/'
-npy_save = '/home/lihang/pretreatment/npy-ending/'
-txt_save = '/home/lihang/pretreatment/txt-ending/'
+npy_save = '/home/lihang/pretreatment/npy_ending_normal/'
+txt_save = '/home/lihang/pretreatment/txt_ending_normal/'
 img_save_plt = '/home/lihang/pretreatment/plt-ending/'
 img_root = '/home/lihang/pretreatment/data_end/'
 
@@ -131,61 +178,85 @@ for name in dir_name:
     ecg_height = array[:,2]
     ecg_weight = array[:,3]
 
+    len_list = []
     #ecg = array[:, 1]
-    peaks, _ = signal.find_peaks(ecg_react, distance=25)
-    ecging_hull = ecg_hull[peaks[1]:peaks[2]]
-    ecging_react = ecg_react[peaks[1]:peaks[2]]
-    ecging_height = ecg_height[peaks[1]:peaks[2]]
-    ecging_weight = ecg_weight[peaks[1]:peaks[2]]
-    #ecging = ecg[peaks[0]:peaks[2]]
-
+    peaks = []
+    #peaks, _ = signal.find_peaks(ecg_react, distance=25)
+    peaks = maxmin(ecg_react,25)
+    len_list.append(len(peaks))
+    print(name + "   peaks number " + str(len(peaks)))
+    for i in range(int(len(peaks))):
+        print(peaks[i])
+    ecging_hull = ecg_hull[peaks[0]:peaks[2]]
+    ecging_react = ecg_react[peaks[0]:peaks[2]]
+    ecging_height = ecg_height[peaks[0]:peaks[2]]
+    ecging_weight = ecg_weight[peaks[0]:peaks[2]]
+    # #ecging = ecg[peaks[0]:peaks[2]]
+    #
     ecg_resample_hull = signal.resample(ecging_hull, 512)
     ecg_resample_react = signal.resample(ecging_react, 512)
     ecg_resample_height = signal.resample(ecging_height, 512)
     ecg_resample_weight = signal.resample(ecging_weight, 512)
-
+    #
     ecg_all = []
     ecg_all.append(ecg_resample_hull)
     ecg_all.append(ecg_resample_react)
     ecg_all.append(ecg_resample_height)
     ecg_all.append(ecg_resample_weight)
-
-    # ecg_all.append(ecging_hull)
-    # ecg_all.append(ecging_react)
-    # ecg_all.append(ecging_height)
-    # ecg_all.append(ecging_weight)
-
+    #
+    # # ecg_all.append(ecging_hull)
+    # # ecg_all.append(ecging_react)
+    # # ecg_all.append(ecging_height)
+    # # ecg_all.append(ecging_weight)
+    #
     ecg_all_trans = np.transpose(ecg_all)
     ecg_all_trans_normal = maxminnorm(ecg_all_trans)
-    np.save(save_name_npy,ecg_all_trans_normal)
+    #np.save(save_name_npy,ecg_all_trans)
 
+    np.save(save_name_npy, ecg_all_trans_normal)
+    #
+    #
     print(save_name_npy + " had been writtern")
     boxes = np.load(save_name_npy)
 
     np.savetxt(save_name_txt, boxes, fmt='%s', newline='\n')
     print(save_name_txt + " had been writtern")
-
-    x_ecg = [i for i in range(ecg_all[0].shape[0])]
-    # plt.subplot(2, 1, 1)
-    # plt.plot(x_ecg, ecg_all[0])
-    # plt.plot(x_ecg, ecg_all[1])
-
-    x_ecg_origin = [i for i in range(array.shape[0])]
-    # plt.subplot(2, 1, 1)
-    # plt.plot(x_ecg_origin, array[:, 0])
-    # plt.plot(x_ecg_origin, array[:, 1])
     #
-    # plt.subplot(2, 1, 2)
-    # plt.plot(x_ecg, ecg_all[0])
-    # plt.plot(x_ecg, ecg_all[1])
-
-    #plt.subplot(2, 1, 1)
-    plt.plot(x_ecg, ecg_all_trans_normal[0])
-    plt.plot(x_ecg, ecg_all_trans_normal[1])
-    #plt.subplot(2, 1, 2)
-    plt.plot(x_ecg, ecg_all_trans_normal[2])
-    plt.plot(x_ecg, ecg_all_trans_normal[3])
-
+    # x_trans = [i for i in range(ecg_all_trans.shape[0])]
+    # #ecg = ecg_all_trans_normal[:, 1]
+    # plt.plot(x_trans, ecg_all_trans[:, 0])
+    # plt.plot(x_trans, ecg_all_trans[:, 1])
+    # plt.plot(x_trans, ecg_all_trans[:, 2])
+    # plt.plot(x_trans, ecg_all_trans[:, 3])
+    x_trans = [i for i in range(ecg_all_trans_normal.shape[0])]
+    #ecg = ecg_all_trans_normal[:, 1]
+    plt.plot(x_trans, ecg_all_trans_normal[:, 0])
+    plt.plot(x_trans, ecg_all_trans_normal[:, 1])
+    plt.plot(x_trans, ecg_all_trans_normal[:, 2])
+    plt.plot(x_trans, ecg_all_trans_normal[:, 3])
+    #
+    #
+    # x_ecg = [i for i in range(ecg_all[0].shape[0])]
+    # # plt.subplot(2, 1, 1)
+    # # plt.plot(x_ecg, ecg_all[0])
+    # # plt.plot(x_ecg, ecg_all[1])
+    #
+    # x_ecg_origin = [i for i in range(array.shape[0])]
+    # # plt.subplot(2, 1, 1)
+    # # plt.plot(x_ecg_origin, array[:, 0])
+    # # plt.plot(x_ecg_origin, array[:, 1])
+    # #
+    # # plt.subplot(2, 1, 2)
+    # # plt.plot(x_ecg, ecg_all[0])
+    # # plt.plot(x_ecg, ecg_all[1])
+    #
+    # #plt.subplot(2, 1, 1)
+    # # plt.plot(x_ecg, ecg_all_trans_normal[0])
+    # # plt.plot(x_ecg, ecg_all_trans_normal[1])
+    # # #plt.subplot(2, 1, 2)
+    # # plt.plot(x_ecg, ecg_all_trans_normal[2])
+    # # plt.plot(x_ecg, ecg_all_trans_normal[3])
+    # #
     plt.savefig(save_plt_name)
     plt.close()  # 有效解决了画图时多条曲线（也就是上一张图的曲线残留）重叠问题
     print(save_plt_name + " had been drawn!")
